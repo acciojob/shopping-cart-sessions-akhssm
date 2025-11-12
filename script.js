@@ -14,7 +14,7 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Retrieve cart safely
+// Get cart safely
 function getCart() {
   const cartData = sessionStorage.getItem("cart");
   try {
@@ -35,22 +35,19 @@ function renderProducts() {
 
   products.forEach((product) => {
     const li = document.createElement("li");
-    li.innerHTML = `
-      ${product.name} - $${product.price}
-      <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
-    `;
-    productList.appendChild(li);
-  });
+    const button = document.createElement("button");
 
-  document.querySelectorAll(".add-to-cart-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const productId = parseInt(btn.getAttribute("data-id"));
-      addToCart(productId);
-    });
+    li.textContent = `${product.name} - $${product.price} `;
+    button.textContent = "Add to Cart";
+    button.setAttribute("data-id", product.id);
+    button.addEventListener("click", () => addToCart(product.id));
+
+    li.appendChild(button);
+    productList.appendChild(li);
   });
 }
 
-// Render cart contents
+// Render cart
 function renderCart() {
   cartList.innerHTML = "";
   const cart = getCart();
@@ -62,12 +59,13 @@ function renderCart() {
   });
 }
 
-// Add to cart (append without overwriting)
+// Add to cart
 function addToCart(productId) {
-  let cart = getCart(); 
+  let cart = getCart();
   const product = products.find((p) => p.id === productId);
+
   if (product) {
-    cart = [...cart, { id: product.id, name: product.name, price: product.price }];
+    cart.push({ id: product.id, name: product.name, price: product.price });
     saveCart(cart);
     renderCart();
   }
