@@ -14,22 +14,22 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Retrieve cart from sessionStorage (always return an array)
+// Retrieve cart safely
 function getCart() {
-  const cart = sessionStorage.getItem("cart");
+  const cartData = sessionStorage.getItem("cart");
   try {
-    return cart ? JSON.parse(cart) : [];
+    return cartData ? JSON.parse(cartData) : [];
   } catch {
     return [];
   }
 }
 
-// Save cart (ensure it’s not nested)
+// Save cart safely
 function saveCart(cart) {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// --- Render Products ---
+// Render product list
 function renderProducts() {
   productList.innerHTML = "";
 
@@ -50,7 +50,7 @@ function renderProducts() {
   });
 }
 
-// --- Render Cart ---
+// Render cart contents
 function renderCart() {
   cartList.innerHTML = "";
   const cart = getCart();
@@ -62,27 +62,26 @@ function renderCart() {
   });
 }
 
-// --- Add to Cart ---
+// Add to cart (append without overwriting)
 function addToCart(productId) {
-  const cart = getCart();
+  let cart = getCart(); 
   const product = products.find((p) => p.id === productId);
-
   if (product) {
-    cart.push({ id: product.id, name: product.name, price: product.price });
+    cart = [...cart, { id: product.id, name: product.name, price: product.price }];
     saveCart(cart);
     renderCart();
   }
 }
 
-// --- Clear Cart ---
+// Clear cart
 function clearCart() {
   sessionStorage.removeItem("cart");
   renderCart();
 }
 
-// --- Event Listeners ---
+// Event listeners
 clearCartBtn.addEventListener("click", clearCart);
 
-// --- Initial Render ---
+// Initial render
 renderProducts();
 renderCart();
