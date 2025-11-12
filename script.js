@@ -14,19 +14,24 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Helper functions for sessionStorage
+// Retrieve cart from sessionStorage (always return an array)
 function getCart() {
   const cart = sessionStorage.getItem("cart");
-  return cart ? JSON.parse(cart) : [];
+  try {
+    return cart ? JSON.parse(cart) : [];
+  } catch {
+    return [];
+  }
 }
 
+// Save cart (ensure it’s not nested)
 function saveCart(cart) {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Render product list
+// --- Render Products ---
 function renderProducts() {
-  productList.innerHTML = ""; 
+  productList.innerHTML = "";
 
   products.forEach((product) => {
     const li = document.createElement("li");
@@ -45,9 +50,9 @@ function renderProducts() {
   });
 }
 
-// Render cart list
+// --- Render Cart ---
 function renderCart() {
-  cartList.innerHTML = ""; 
+  cartList.innerHTML = "";
   const cart = getCart();
 
   cart.forEach((item) => {
@@ -57,33 +62,27 @@ function renderCart() {
   });
 }
 
-// Add item to cart
+// --- Add to Cart ---
 function addToCart(productId) {
   const cart = getCart();
   const product = products.find((p) => p.id === productId);
+
   if (product) {
-    cart.push(product);
+    cart.push({ id: product.id, name: product.name, price: product.price });
     saveCart(cart);
-    renderCart(); 
+    renderCart();
   }
 }
 
-// Remove item from cart (not required but left for completeness)
-function removeFromCart(productId) {
-  let cart = getCart();
-  cart = cart.filter((item) => item.id !== productId);
-  saveCart(cart);
-  renderCart();
-}
-
-// Clear cart
+// --- Clear Cart ---
 function clearCart() {
   sessionStorage.removeItem("cart");
   renderCart();
 }
 
+// --- Event Listeners ---
 clearCartBtn.addEventListener("click", clearCart);
 
-// Initial render
+// --- Initial Render ---
 renderProducts();
 renderCart();
